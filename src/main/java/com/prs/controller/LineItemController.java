@@ -49,8 +49,9 @@ public class LineItemController {
 
 	@PostMapping("")
 	public LineItem addLineItem(@RequestBody LineItem lineitem) {
+		lineitemRepo.save(lineitem);
 		recalTotal(lineitem.getRequest());
-		return lineitemRepo.save(lineitem);
+		return lineitem;
 
 	}
 
@@ -78,19 +79,28 @@ public class LineItemController {
 	}
 
 	@DeleteMapping("/{id}")
-	public Boolean deleteLineItem(@PathVariable int id, LineItem lineitem) {
+	public Boolean deleteLineItem(@PathVariable int id) {
+		Request request = null;
 		boolean success = false;
 		if (lineitemRepo.existsById(id)) {
+			LineItem lineitem= lineitemRepo.findById(id).get();
+			request = lineitem.getRequest();
 			lineitemRepo.deleteById(id);
 			success = true;
 		} else {
 			System.err.println("Delete Error: No lineitem  exists for id:" + id);
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lineitem Not Found");
 		}
-		recalTotal(lineitem.getRequest());
+		recalTotal(request);
 		return success;
 
 	}
+	@GetMapping("/by-request/{requestId}")
+	public List<LineItem> getLineitemsByRequestId(@PathVariable int requestId){
+			List<LineItem> lineitem= lineitemRepo.findByRequestId(requestId);
+			return lineitem;
+	}
+	
 
 	private void recalTotal(Request request) {
 		List<LineItem> lineItems = lineitemRepo.findByRequest(request);

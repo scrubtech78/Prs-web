@@ -8,5 +8,6 @@ import com.prs.model.Request;
 
 public interface LineItemRepo extends JpaRepository<LineItem, Integer> {
 	List<LineItem> findByRequest(Request request);
+	List<LineItem> findByRequestId(int requestId);
 
 }
